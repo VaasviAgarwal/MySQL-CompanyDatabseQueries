@@ -1,0 +1,862 @@
+Author - Vaasvi Agarwal
+
+****************************************************************************************************************************************************************************************************
+
+Creating a database
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| world              |
++--------------------+
+6 rows in set (0.02 sec)
+
+mysql> create database company;
+Query OK, 1 row affected (0.25 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| company            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| world              |
++--------------------+
+7 rows in set (0.00 sec)
+
+*******************************************************************************************************************************************************************************************************
+
+1. Create tables with relevant foreign keys
+
+mysql> use company;
+Database changed
+mysql> create table employee(
+    -> fname varchar(50),
+    -> minit varchar(10),
+    -> lname varchar(50),
+    -> ssn int,
+    -> bdate date,
+    -> address varchar(500),
+    -> sex varchar(10),
+    -> salary int,
+    -> super_ssn int,
+    -> dno int,
+    -> primary key(ssn),
+    -> foreign key(super_ssn) references employee(ssn)
+    -> );
+Query OK, 0 rows affected (1.28 sec)
+
+mysql> create table department(
+    -> dname varchar(50),
+    -> dnumber int,
+    -> mgr_ssn int,
+    -> mgr_start_date date,
+    -> primary key(dnumber),
+    -> foreign key(mgr_ssn) references employee(ssn)
+    -> );
+Query OK, 0 rows affected (0.80 sec)
+
+mysql> create table dept_locations(
+    -> dnumber int,
+    -> dlocation varchar(50),
+    -> primary key(dnumber, dlocation),
+    -> foreign key(dnumber) references department(dnumber)
+    -> );
+Query OK, 0 rows affected (0.76 sec)
+
+mysql> create table project(
+    -> pname varchar(100),
+    -> pnumber int,
+    -> plocation varchar(50),
+    -> dnum int,
+    -> primary key(pnumber),
+    -> foreign key(dnum) references department(dnumber)
+    -> );
+Query OK, 0 rows affected (0.52 sec)
+
+mysql> create table works_on(
+    -> essn int,
+    -> pno int,
+    -> hours float,
+    -> primary key(essn, pno),
+    -> foreign key(essn) references employee(ssn),
+    -> foreign key(pno) references project(pnumber)
+    -> );
+Query OK, 0 rows affected (3.41 sec)
+
+mysql> create table dependent(
+    -> essn int,
+    -> dependent_name varchar(100),
+    -> sex char(1),
+    -> b_date date,
+    -> relationship varchar(100),
+    -> primary key(essn, dependent_name),
+    -> foreign key(essn) references employee(ssn)
+    -> );
+Query OK, 0 rows affected (1.93 sec)
+
+********************************************************************************************************************
+
+2. Populate the tables with data
+
+mysql> insert into employee values('john','B','smith',123456789,'1968-01-19','731 fondren,houston,TX','M',30000,NULL,5);
+Query OK, 1 row affected (0.39 sec)
+
+mysql> insert into employee values('franklin','T','wong',333445555,'1955-12-08','638 voss,houston,TX','M',40000,NULL,5);
+Query OK, 1 row affected (0.10 sec)
+
+mysql> insert into employee values('alicia','J','zelaya',999887777,'1968-01-19','3321 castle,spring,TX','F',25000,NULL,4);
+Query OK, 1 row affected (0.08 sec)
+
+mysql> insert into employee values('jennifer','s','wallace',987654321,'1941-06-20','291 berry,bellaire,TX','F',43000,NULL,4);
+Query OK, 1 row affected (0.07 sec)
+
+mysql> insert into employee values('ramesh','K','narayan',666884444,'1962-09-15','975 fire oak,humble,TX','M',38000,NULL,5);
+Query OK, 1 row affected (0.15 sec)
+
+mysql> insert into employee values('joyce','A','english',453453453,'1972-07-31','5631 rice,houston,TX','F',25000,NULL,5);
+Query OK, 1 row affected (0.18 sec)
+
+mysql> insert into employee values('ahmad', 'V','jabbar',987987987,'1969-03-29','980 dallas,houston,TX','M',25000,NULL,4);
+Query OK, 1 row affected (0.09 sec)
+
+mysql> insert into employee values('james','E','borg',888665555,'1937-11-10','450 stone,houston,TX','M',55000,NULL,1);
+Query OK, 1 row affected (0.08 sec)
+
+mysql> select * from employee
+    -> ;
++----------+-------+---------+-----------+------------+------------------------+------+--------+-----------+------+
+| fname    | minit | lname   | ssn       | bdate      | address                | sex  | salary | super_ssn | dno  |
++----------+-------+---------+-----------+------------+------------------------+------+--------+-----------+------+
+| john     | B     | smith   | 123456789 | 1968-01-19 | 731 fondren,houston,TX | M    |  30000 |      NULL |    5 |
+| franklin | T     | wong    | 333445555 | 1955-12-08 | 638 voss,houston,TX    | M    |  40000 |      NULL |    5 |
+| joyce    | A     | english | 453453453 | 1972-07-31 | 5631 rice,houston,TX   | F    |  25000 |      NULL |    5 |
+| ramesh   | K     | narayan | 666884444 | 1962-09-15 | 975 fire oak,humble,TX | M    |  38000 |      NULL |    5 |
+| james    | E     | borg    | 888665555 | 1937-11-10 | 450 stone,houston,TX   | M    |  55000 |      NULL |    1 |
+| jennifer | s     | wallace | 987654321 | 1941-06-20 | 291 berry,bellaire,TX  | F    |  43000 |      NULL |    4 |
+| ahmad    | V     | jabbar  | 987987987 | 1969-03-29 | 980 dallas,houston,TX  | M    |  25000 |      NULL |    4 |
+| alicia   | J     | zelaya  | 999887777 | 1968-01-19 | 3321 castle,spring,TX  | F    |  25000 |      NULL |    4 |
++----------+-------+---------+-----------+------------+------------------------+------+--------+-----------+------+
+8 rows in set (0.03 sec)
+
+mysql> insert into department values('research',5,NULL,'1988-05-22');
+Query OK, 1 row affected (0.32 sec)
+
+mysql> insert into department values('administration',4,987654321,'1995-01-01');
+Query OK, 1 row affected (1.14 sec)
+
+mysql> insert into department values('headquarters',1,888665555,'1981-06-19');
+Query OK, 1 row affected (0.20 sec)
+
+mysql> select * from department
+    -> ;
++----------------+---------+-----------+----------------+
+| dname          | dnumber | mgr_ssn   | mgr_start_date |
++----------------+---------+-----------+----------------+
+| headquarters   |       1 | 888665555 | 1981-06-19     |
+| administration |       4 | 987654321 | 1995-01-01     |
+| research       |       5 |      NULL | 1988-05-22     |
++----------------+---------+-----------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> update department set mgr_ssn = 333445555 where dnumber = 5;
+Query OK, 1 row affected (0.11 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update employee set super_ssn = 333445555 where fname='john';
+Query OK, 1 row affected (0.18 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update employee set super_ssn=888665555 where fname='franklin';
+Query OK, 1 row affected (0.44 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update employee set super_ssn =333445555 where fname='joyce';
+Query OK, 1 row affected (0.07 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update employee set super_ssn=333445555 where fname='ramesh';
+Query OK, 1 row affected (0.09 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update employee set super_ssn=888665555 where fname='jennifer';
+Query OK, 1 row affected (0.06 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update employee set super_ssn=987654321 where fname='ahmad';
+Query OK, 1 row affected (0.12 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update employee set super_ssn=987654321 where fname='alicia';
+Query OK, 1 row affected (0.06 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> insert into dept_locations(dnumber, dlocation) values
+    -> (1,'houston'),
+    -> (4,'stafford'),
+    -> (5,'bellaire'),
+    -> (5,'sugarland'),
+    -> (5,'houston');
+Query OK, 5 rows affected (0.11 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> insert into project(pname,pnumber,plocation,dnum) values
+    -> ('productx',1,'bellaire',5),
+    -> ('producty',2,'sugarland',5),
+    -> ('productz',3,'houston',5),
+    -> ('computerization',10,'stafford',4),
+    -> ('reorganization',20,'houston',1),
+    -> ('newbenefits',30,'stafford',4);
+Query OK, 6 rows affected (0.15 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> insert into dependent(essn,dependent_name,sex,b_date,relationship) values
+    -> (333445555,'alica','F','1986-04-05','daughter'),
+    -> (333445555,'theodore','M','1983-10-25','son'),
+    -> (333445555,'joy','F','1958-05-03','spouse'),
+    -> (987654321,'abner','M','1942-02-28','spouse'),
+    -> (123456789,'michael','M','1988-12-04','son'),
+    -> (123456789,'alice','F','1988-12-30','daughter'),
+    -> (123456789,'elizabeth','F','1967-05-05','spouse');
+Query OK, 7 rows affected (0.14 sec)
+Records: 7  Duplicates: 0  Warnings: 0
+
+mysql> insert into works_on(essn, pno, hours) values
+    -> (123456789,1,32.5),
+    -> (123456789,2,7.5),
+    -> (666884444,3,40.0),
+    -> (453453453,1,20.0),
+    -> (453453453,2,20.0),
+    -> (333445555,2,10.0),
+    -> (333445555,3,10.0),
+    -> (333445555,10,10.0),
+    -> (333445555,20,10.0),
+    -> (999887777,30,30.0),
+    -> (999887777,10,10.0),
+    -> (987987987,10,35.0),
+    -> (987987987,30,5.0),
+    -> (987654321,30,20.0),
+    -> (987654321,20,15.0),
+    -> (888665555,20,null);
+Query OK, 16 rows affected (0.29 sec)
+Records: 16  Duplicates: 0  Warnings: 0
+
+mysql> select * from employee;
++----------+-------+---------+-----------+------------+------------------------+------+--------+-----------+------+
+| fname    | minit | lname   | ssn       | bdate      | address                | sex  | salary | super_ssn | dno  |
++----------+-------+---------+-----------+------------+------------------------+------+--------+-----------+------+
+| john     | B     | smith   | 123456789 | 1968-01-19 | 731 fondren,houston,TX | M    |  30000 | 333445555 |    5 |
+| franklin | T     | wong    | 333445555 | 1955-12-08 | 638 voss,houston,TX    | M    |  40000 | 888665555 |    5 |
+| joyce    | A     | english | 453453453 | 1972-07-31 | 5631 rice,houston,TX   | F    |  25000 | 333445555 |    5 |
+| ramesh   | K     | narayan | 666884444 | 1962-09-15 | 975 fire oak,humble,TX | M    |  38000 | 333445555 |    5 |
+| james    | E     | borg    | 888665555 | 1937-11-10 | 450 stone,houston,TX   | M    |  55000 |      NULL |    1 |
+| jennifer | s     | wallace | 987654321 | 1941-06-20 | 291 berry,bellaire,TX  | F    |  43000 | 888665555 |    4 |
+| ahmad    | V     | jabbar  | 987987987 | 1969-03-29 | 980 dallas,houston,TX  | M    |  25000 | 987654321 |    4 |
+| alicia   | J     | zelaya  | 999887777 | 1968-01-19 | 3321 castle,spring,TX  | F    |  25000 | 987654321 |    4 |
++----------+-------+---------+-----------+------------+------------------------+------+--------+-----------+------+
+8 rows in set (0.00 sec)
+
+mysql> select * from department;
++----------------+---------+-----------+----------------+
+| dname          | dnumber | mgr_ssn   | mgr_start_date |
++----------------+---------+-----------+----------------+
+| headquarters   |       1 | 888665555 | 1981-06-19     |
+| administration |       4 | 987654321 | 1995-01-01     |
+| research       |       5 | 333445555 | 1988-05-22     |
++----------------+---------+-----------+----------------+
+3 rows in set (0.02 sec)
+
+mysql> select * from dept_locations;
++---------+-----------+
+| dnumber | dlocation |
++---------+-----------+
+|       1 | houston   |
+|       4 | stafford  |
+|       5 | bellaire  |
+|       5 | houston   |
+|       5 | sugarland |
++---------+-----------+
+5 rows in set (0.02 sec)
+
+mysql> select * from project;
++-----------------+---------+-----------+------+
+| pname           | pnumber | plocation | dnum |
++-----------------+---------+-----------+------+
+| productx        |       1 | bellaire  |    5 |
+| producty        |       2 | sugarland |    5 |
+| productz        |       3 | houston   |    5 |
+| computerization |      10 | stafford  |    4 |
+| reorganization  |      20 | houston   |    1 |
+| newbenefits     |      30 | stafford  |    4 |
++-----------------+---------+-----------+------+
+6 rows in set (0.00 sec)
+
+mysql> select * from works_on;
++-----------+-----+-------+
+| essn      | pno | hours |
++-----------+-----+-------+
+| 123456789 |   1 |  32.5 |
+| 123456789 |   2 |   7.5 |
+| 333445555 |   2 |    10 |
+| 333445555 |   3 |    10 |
+| 333445555 |  10 |    10 |
+| 333445555 |  20 |    10 |
+| 453453453 |   1 |    20 |
+| 453453453 |   2 |    20 |
+| 666884444 |   3 |    40 |
+| 888665555 |  20 |  NULL |
+| 987654321 |  20 |    15 |
+| 987654321 |  30 |    20 |
+| 987987987 |  10 |    35 |
+| 987987987 |  30 |     5 |
+| 999887777 |  10 |    10 |
+| 999887777 |  30 |    30 |
++-----------+-----+-------+
+16 rows in set (0.02 sec)
+
+mysql> select * from dependent;
++-----------+----------------+------+------------+--------------+
+| essn      | dependent_name | sex  | b_date     | relationship |
++-----------+----------------+------+------------+--------------+
+| 123456789 | alice          | F    | 1988-12-30 | daughter     |
+| 123456789 | elizabeth      | F    | 1967-05-05 | spouse       |
+| 123456789 | michael        | M    | 1988-12-04 | son          |
+| 333445555 | alica          | F    | 1986-04-05 | daughter     |
+| 333445555 | joy            | F    | 1958-05-03 | spouse       |
+| 333445555 | theodore       | M    | 1983-10-25 | son          |
+| 987654321 | abner          | M    | 1942-02-28 | spouse       |
++-----------+----------------+------+------------+--------------+
+7 rows in set (0.03 sec)
+
+***************************************************************************************************************************************************************************************************
+
+3. Perform the following queries on the dataframe
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. Display all the details of all the employees working in the company
+
+mysql> select * from employee;
++----------+-------+---------+-----------+------------+------------------------+------+--------+-----------+------+
+| fname    | minit | lname   | ssn       | bdate      | address                | sex  | salary | super_ssn | dno  |
++----------+-------+---------+-----------+------------+------------------------+------+--------+-----------+------+
+| john     | B     | smith   | 123456789 | 1968-01-19 | 731 fondren,houston,TX | M    |  30000 | 333445555 |    5 |
+| franklin | T     | wong    | 333445555 | 1955-12-08 | 638 voss,houston,TX    | M    |  40000 | 888665555 |    5 |
+| joyce    | A     | english | 453453453 | 1972-07-31 | 5631 rice,houston,TX   | F    |  25000 | 333445555 |    5 |
+| ramesh   | K     | narayan | 666884444 | 1962-09-15 | 975 fire oak,humble,TX | M    |  38000 | 333445555 |    5 |
+| james    | E     | borg    | 888665555 | 1937-11-10 | 450 stone,houston,TX   | M    |  55000 |      NULL |    1 |
+| jennifer | s     | wallace | 987654321 | 1941-06-20 | 291 berry,bellaire,TX  | F    |  43000 | 888665555 |    4 |
+| ahmad    | V     | jabbar  | 987987987 | 1969-03-29 | 980 dallas,houston,TX  | M    |  25000 | 987654321 |    4 |
+| alicia   | J     | zelaya  | 999887777 | 1968-01-19 | 3321 castle,spring,TX  | F    |  25000 | 987654321 |    4 |
++----------+-------+---------+-----------+------------+------------------------+------+--------+-----------+------+
+8 rows in set (0.00 sec)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+2. Display ssn, lname, fname, address of employees who work in department no 7.
+
+mysql> select ssn, lname, fname, address from employee where dno=7;
+Empty set (0.00 sec)
+
+(Since No value has department number 7 in our database we can see that this query works using an example of data number 4)
+
+mysql>  select ssn, lname, fname, address from employee where dno=4;
++-----------+---------+----------+-----------------------+
+| ssn       | lname   | fname    | address               |
++-----------+---------+----------+-----------------------+
+| 987654321 | wallace | jennifer | 291 berry,bellaire,TX |
+| 987987987 | jabbar  | ahmad    | 980 dallas,houston,TX |
+| 999887777 | zelaya  | alicia   | 3321 castle,spring,TX |
++-----------+---------+----------+-----------------------+
+3 rows in set (0.00 sec)
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+3. Retrieve the birthdate and address of the employee whose name is 'Franklin T. Wong'
+
+mysql> select bdate, address from employee where fname = 'franklin' and minit = 'T' and lname = 'Wong';
++------------+---------------------+
+| bdate      | address             |
++------------+---------------------+
+| 1955-12-08 | 638 voss,houston,TX |
++------------+---------------------+
+1 row in set (0.00 sec)
+
+(To check if the value is right rechecking the employee table)
+
+mysql> select * from employee;
++----------+-------+---------+-----------+------------+------------------------+------+--------+-----------+------+
+| fname    | minit | lname   | ssn       | bdate      | address                | sex  | salary | super_ssn | dno  |
++----------+-------+---------+-----------+------------+------------------------+------+--------+-----------+------+
+| john     | B     | smith   | 123456789 | 1968-01-19 | 731 fondren,houston,TX | M    |  30000 | 333445555 |    5 |
+| franklin | T     | wong    | 333445555 | 1955-12-08 | 638 voss,houston,TX    | M    |  40000 | 888665555 |    5 |
+| joyce    | A     | english | 453453453 | 1972-07-31 | 5631 rice,houston,TX   | F    |  25000 | 333445555 |    5 |
+| ramesh   | K     | narayan | 666884444 | 1962-09-15 | 975 fire oak,humble,TX | M    |  38000 | 333445555 |    5 |
+| james    | E     | borg    | 888665555 | 1937-11-10 | 450 stone,houston,TX   | M    |  55000 |      NULL |    1 |
+| jennifer | s     | wallace | 987654321 | 1941-06-20 | 291 berry,bellaire,TX  | F    |  43000 | 888665555 |    4 |
+| ahmad    | V     | jabbar  | 987987987 | 1969-03-29 | 980 dallas,houston,TX  | M    |  25000 | 987654321 |    4 |
+| alicia   | J     | zelaya  | 999887777 | 1968-01-19 | 3321 castle,spring,TX  | F    |  25000 | 987654321 |    4 |
++----------+-------+---------+-----------+------------+------------------------+------+--------+-----------+------+
+8 rows in set (0.00 sec)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+4. Retrieve the name and salary of every employee
+
+mysql> select concat_ws(' ', fname, minit, lname) as name, salary from employee;
++--------------------+--------+
+| name               | salary |
++--------------------+--------+
+| john B smith       |  30000 |
+| franklin T wong    |  40000 |
+| joyce A english    |  25000 |
+| ramesh K narayan   |  38000 |
+| james E borg       |  55000 |
+| jennifer s wallace |  43000 |
+| ahmad V jabbar     |  25000 |
+| alicia J zelaya    |  25000 |
++--------------------+--------+
+8 rows in set (0.05 sec)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+5. Retrieve all distinct salary values
+
+mysql> select distinct(salary) from employee;
++--------+
+| salary |
++--------+
+|  30000 |
+|  40000 |
+|  25000 |
+|  38000 |
+|  55000 |
+|  43000 |
++--------+
+6 rows in set (0.10 sec)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+6. Retrieve all employee names whose address is in ‘Bellaire’
+
+mysql> select fname,minit,lname from employee where address like '%bellaire%';
++----------+-------+---------+
+| fname    | minit | lname   |
++----------+-------+---------+
+| jennifer | s     | wallace |
++----------+-------+---------+
+1 row in set (0.06 sec)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+7. Retrieve all employees who were born during the 1950s
+
+mysql> select * from employee where bdate like'195%';
++----------+-------+-------+-----------+------------+---------------------+------+--------+-----------+------+
+| fname    | minit | lname | ssn       | bdate      | address             | sex  | salary | super_ssn | dno  |
++----------+-------+-------+-----------+------------+---------------------+------+--------+-----------+------+
+| franklin | T     | wong  | 333445555 | 1955-12-08 | 638 voss,houston,TX | M    |  40000 | 888665555 |    5 |
++----------+-------+-------+-----------+------------+---------------------+------+--------+-----------+------+
+1 row in set (0.00 sec)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+8. Retrieve all employees in department 5 whose salary is between 50,000 and 60,000(inclusive)
+
+mysql> select * from employee where dno=5 and salary between 50000 and 60000;
+Empty set (0.28 sec)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+9. Retrieve the names of all employees who do not have supervisors
+
+mysql> select concat_ws(' ', fname, minit, lname) as name from employee where super_ssn is NULL;
++--------------+
+| name         |
++--------------+
+| james E borg |
++--------------+
+1 row in set (0.07 sec)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+10. Retrieve SSN and department name for all employees
+
+mysql> select concat_ws(' ', fname, minit, lname) as name, ssn, dname from employee inner join department on dno = dnumber;
++--------------------+-----------+----------------+
+| name               | ssn       | dname          |
++--------------------+-----------+----------------+
+| john B smith       | 123456789 | research       |
+| franklin T wong    | 333445555 | research       |
+| joyce A english    | 453453453 | research       |
+| ramesh K narayan   | 666884444 | research       |
+| james E borg       | 888665555 | headquarters   |
+| jennifer s wallace | 987654321 | administration |
+| ahmad V jabbar     | 987987987 | administration |
+| alicia J zelaya    | 999887777 | administration |
++--------------------+-----------+----------------+
+8 rows in set (0.00 sec)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+11. Retrieve the name and address of all employees who work for the 'Research' department
+
+mysql> select concat_ws(' ', fname, minit, lname) as name, address, dname from employee inner join department on dno=dnumber where dname ='research';
++------------------+------------------------+----------+
+| name             | address                | dname    |
++------------------+------------------------+----------+
+| john B smith     | 731 fondren,houston,TX | research |
+| franklin T wong  | 638 voss,houston,TX    | research |
+| joyce A english  | 5631 rice,houston,TX   | research |
+| ramesh K narayan | 975 fire oak,humble,TX | research |
++------------------+------------------------+----------+
+4 rows in set (0.00 sec)
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+12. For every project located in 'Stafford', list the project number, the controlling department number, and the department manager's last name, address, and birthdate.
+
+mysql> select pnumber, dnumber, lname, address, bdate from project inner join department on dnum = dnumber and plocation = 'stafford'
+    -> inner join employee on ssn = mgr_ssn;
++---------+---------+---------+-----------------------+------------+
+| pnumber | dnumber | lname   | address               | bdate      |
++---------+---------+---------+-----------------------+------------+
+|      10 |       4 | wallace | 291 berry,bellaire,TX | 1941-06-20 |
+|      30 |       4 | wallace | 291 berry,bellaire,TX | 1941-06-20 |
++---------+---------+---------+-----------------------+------------+
+2 rows in set (0.00 sec)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+13. For each employee, retrieve the employee's name, and the name of his or her immediate supervisor.
+
+mysql> select concat_ws(' ', e1.fname, e1.minit, e1.lname) as employee, concat_ws(' ', e2.fname, e2.minit, e2.lname) as immediate_supervisor from employee e1, employee e2
+    -> where e1.super_ssn = e2.ssn;
++--------------------+----------------------+
+| employee           | immediate_supervisor |
++--------------------+----------------------+
+| john B smith       | franklin T wong      |
+| franklin T wong    | james E borg         |
+| joyce A english    | franklin T wong      |
+| ramesh K narayan   | franklin T wong      |
+| jennifer s wallace | james E borg         |
+| ahmad V jabbar     | jennifer s wallace   |
+| alicia J zelaya    | jennifer s wallace   |
++--------------------+----------------------+
+7 rows in set (0.02 sec)
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+14. Retrieve all combinations of Employee Name and Department Name
+
+mysql> select concat_ws(' ', fname, minit, lname) as 'Employee', dname as 'Department Name' from employee, department;
++--------------------+-----------------+
+| Employee           | Department Name |
++--------------------+-----------------+
+| john B smith       | research        |
+| john B smith       | administration  |
+| john B smith       | headquarters    |
+| franklin T wong    | research        |
+| franklin T wong    | administration  |
+| franklin T wong    | headquarters    |
+| joyce A english    | research        |
+| joyce A english    | administration  |
+| joyce A english    | headquarters    |
+| ramesh K narayan   | research        |
+| ramesh K narayan   | administration  |
+| ramesh K narayan   | headquarters    |
+| james E borg       | research        |
+| james E borg       | administration  |
+| james E borg       | headquarters    |
+| jennifer s wallace | research        |
+| jennifer s wallace | administration  |
+| jennifer s wallace | headquarters    |
+| ahmad V jabbar     | research        |
+| ahmad V jabbar     | administration  |
+| ahmad V jabbar     | headquarters    |
+| alicia J zelaya    | research        |
+| alicia J zelaya    | administration  |
+| alicia J zelaya    | headquarters    |
++--------------------+-----------------+
+24 rows in set (0.00 sec)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+15. Make a list of all project numbers for projects that involve an employee whose last name is 'Narayan’ either as a worker or as a manager of the department that controls the project.
+
+mysql> select distinct pnumber,pname from project,department,employee where dnum=dnumber and mgr_ssn = ssn
+    -> and lname='narayan' UNION
+    -> select distinct pnumber,pname from project,works_on,employee where pnumber=pno and essn=ssn
+    -> and lname='narayan';
++---------+----------+
+| pnumber | pname    |
++---------+----------+
+|       3 | productz |
++---------+----------+
+1 row in set (0.06 sec)
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+16. Increase the salary of all employees working on the 'ProductX' project by 15%. Retrieve employee name and increased salary of these employees.
+
+mysql> select concat_ws(' ', fname, minit, lname) as 'Name', salary as 'Previous Salaray', salary+(salary*15/100) as 'Increased Salary' from employee e, works_on w, project p
+    -> where e.ssn = w.essn and w.pno = p.pnumber and p.pname = 'productx';
++-----------------+------------------+------------------+
+| Name            | Previous Salaray | Increased Salary |
++-----------------+------------------+------------------+
+| john B smith    |            30000 |       34500.0000 |
+| joyce A english |            25000 |       28750.0000 |
++-----------------+------------------+------------------+
+2 rows in set (0.21 sec)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+17. Retrieve a list of employees and the project name each works in, ordered by the employee's department, and within each department ordered alphabetically by employee first name.
+
+mysql> select d.dname,concat_ws(' ',e.fname,e.minit,e.lname) as'Name',p.pname from department d, employee e, works_on w, project p
+    -> where d.dnumber = e.dno and e.ssn = w.essn and w.pno=p.pnumber
+    -> order by d.dname, name;
++----------------+--------------------+-----------------+
+| dname          | Name               | pname           |
++----------------+--------------------+-----------------+
+| administration | ahmad V jabbar     | computerization |
+| administration | ahmad V jabbar     | newbenefits     |
+| administration | alicia J zelaya    | computerization |
+| administration | alicia J zelaya    | newbenefits     |
+| administration | jennifer s wallace | reorganization  |
+| administration | jennifer s wallace | newbenefits     |
+| headquarters   | james E borg       | reorganization  |
+| research       | franklin T wong    | producty        |
+| research       | franklin T wong    | productz        |
+| research       | franklin T wong    | computerization |
+| research       | franklin T wong    | reorganization  |
+| research       | john B smith       | productx        |
+| research       | john B smith       | producty        |
+| research       | joyce A english    | productx        |
+| research       | joyce A english    | producty        |
+| research       | ramesh K narayan   | productz        |
++----------------+--------------------+-----------------+
+16 rows in set (0.00 sec)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+18. Select the names of employees whose salary does not match with salary of any employee in department 10.
+
+mysql> select concat_ws(' ', fname, minit, lname) as Name from employee where salary <> all(select salary from employee where dno = 10);
++--------------------+
+| Name               |
++--------------------+
+| john B smith       |
+| franklin T wong    |
+| joyce A english    |
+| ramesh K narayan   |
+| james E borg       |
+| jennifer s wallace |
+| ahmad V jabbar     |
+| alicia J zelaya    |
++--------------------+
+8 rows in set (0.04 sec)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+19. Retrieve the name of each employee who has a dependent with the same first name and same sex as the employee.
+
+mysql> select concat_ws(' ', fname, minit, lname) as Name, dependent_name from employee, dependent
+    -> where essn = ssn and fname = dependent_name and employee.sex = dependent.sex;
+Empty set (0.00 sec)
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+20. Retrieve the employee numbers of all employees who work on project located in Bellaire, Houston, or Stafford.
+
+mysql> select distinct e.ssn from employee e,works_on w,project p
+    -> where e.ssn=w.essn and w.pno in (select pnumber from project where plocation in('bellaire','houston','stafford'));
++-----------+
+| ssn       |
++-----------+
+| 999887777 |
+| 987987987 |
+| 987654321 |
+| 888665555 |
+| 333445555 |
+| 666884444 |
+| 453453453 |
+| 123456789 |
++-----------+
+8 rows in set (0.05 sec)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+21. Find the sum of the salaries of all employees, the maximum salary, the minimum salary, and the average salary. Display with proper headings.
+
+mysql> select sum(salary) 'Sum of Salary', max(salary) 'Maximum Salary', min(salary) 'Minimum Salary', avg(salary) 'Average Salary' from employee;
++---------------+----------------+----------------+----------------+
+| Sum of Salary | Maximum Salary | Minimum Salary | Average Salary |
++---------------+----------------+----------------+----------------+
+|        281000 |          55000 |          25000 |     35125.0000 |
++---------------+----------------+----------------+----------------+
+1 row in set (0.00 sec)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+22. Find the sum of the salaries and number of employees of all employees of the ‘Marketing’ department, as well as the maximum salary, the minimum salary, and the average salary in this department.
+
+mysql> select sum(salary) 'Sum of Salary', count(*) 'Number of Employees', max(salary) 'Maximum Salary', min(salary) 'Minimum Salary', avg(salary) 'Average Salary' from (employee join department on dno=dnumber) where dname = 'research';
++---------------+---------------------+----------------+----------------+----------------+
+| Sum of Salary | Number of Employees | Maximum Salary | Minimum Salary | Average Salary |
++---------------+---------------------+----------------+----------------+----------------+
+|        133000 |                   4 |          40000 |          25000 |     33250.0000 |
++---------------+---------------------+----------------+----------------+----------------+
+1 row in set (0.11 sec)
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+23. Select the names of employees whose salary is greater than the average salary of all employees in department 10.
+
+mysql> select concat_ws(' ', fname, minit, lname), salary from employee where salary>(select avg(salary) from employee where dno=10);
+Empty set (0.09 sec)
+
+(Example with dno = 5 as 10 does not exist in our database)
+
+mysql> select concat_ws(' ', fname, minit, lname), salary from employee where salary>(select avg(salary) from employee where dno=5);
++-------------------------------------+--------+
+| concat_ws(' ', fname, minit, lname) | salary |
++-------------------------------------+--------+
+| franklin T wong                     |  40000 |
+| ramesh K narayan                    |  38000 |
+| james E borg                        |  55000 |
+| jennifer s wallace                  |  43000 |
++-------------------------------------+--------+
+4 rows in set (0.00 sec)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+24. For each department, retrieve the department number, the number of employees in the department, and their average salary
+
+mysql> select dnumber,dname,count(ssn),avg(salary) from department,employee where dno=dnumber group by dname,dnumber;
++---------+----------------+------------+-------------+
+| dnumber | dname          | count(ssn) | avg(salary) |
++---------+----------------+------------+-------------+
+|       5 | research       |          4 |  33250.0000 |
+|       1 | headquarters   |          1 |  55000.0000 |
+|       4 | administration |          3 |  31000.0000 |
++---------+----------------+------------+-------------+
+3 rows in set (0.02 sec)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+25. For each project, retrieve the project number, the project name, and the number of employees who work on that project.
+
+mysql> select pnumber 'Project Number', pname 'Project Name', count(*) 'Number of Employees' from project, works_on where pnumber=pno group by pname;
++----------------+-----------------+---------------------+
+| Project Number | Project Name    | Number of Employees |
++----------------+-----------------+---------------------+
+|              1 | productx        |                   2 |
+|              2 | producty        |                   3 |
+|              3 | productz        |                   2 |
+|             10 | computerization |                   3 |
+|             20 | reorganization  |                   3 |
+|             30 | newbenefits     |                   3 |
++----------------+-----------------+---------------------+
+6 rows in set (0.00 sec)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+26. Change the location and controlling department number for all projects having more than 5 employees to ‘Bellaire’ and 6 respectively.
+
+mysql> update project set plocation = 'bellaire', dnum = 6 where (select count(essn) from works_on where pno = pnumber) > 5;
+Query OK, 0 rows affected (0.00 sec)
+Rows matched: 0  Changed: 0  Warnings: 0
+
+mysql> select * from project
+    -> ;
++-----------------+---------+-----------+------+
+| pname           | pnumber | plocation | dnum |
++-----------------+---------+-----------+------+
+| productx        |       1 | bellaire  |    5 |
+| producty        |       2 | sugarland |    5 |
+| productz        |       3 | houston   |    5 |
+| computerization |      10 | stafford  |    4 |
+| reorganization  |      20 | houston   |    1 |
+| newbenefits     |      30 | stafford  |    4 |
++-----------------+---------+-----------+------+
+6 rows in set (0.00 sec)
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+27. For each department having more than 10 employees, retrieve the department no, no of employees drawing more than 40,000 as salary.
+
+mysql> select dnumber 'Department Number', count(*) 'Number of Employees' from department, employee where dnumber = dno and salary>40000
+    -> group by dname having count(ssn)>10;
+Empty set (0.03 sec)
+
+(To see that the query works we can use another example)
+
+mysql>  select dnumber 'Department Number', count(*) 'Number of Employees' from department, employee where dnumber = dno and salary>28000
+    ->  group by dname having count(ssn)>2;
++-------------------+---------------------+
+| Department Number | Number of Employees |
++-------------------+---------------------+
+|                 5 |                   3 |
++-------------------+---------------------+
+1 row in set (0.00 sec)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+28. Display employee names having no dependent in descending order.
+
+mysql>  select concat_ws(' ', fname, minit, lname) as Name from employee where ssn not in (select distinct essn from dependent) order by name desc;
++------------------+
+| Name             |
++------------------+
+| ramesh K narayan |
+| joyce A english  |
+| james E borg     |
+| alicia J zelaya  |
+| ahmad V jabbar   |
++------------------+
+5 rows in set (0.03 sec)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+29. For each department find number of female and number of male employees.
+
+mysql> select d.dnumber,d.dname,e.sex,count(e.sex) from department d inner join employee e on e.dno=d.dnumber group by d.dname,e.sex;
++---------+----------------+------+--------------+
+| dnumber | dname          | sex  | count(e.sex) |
++---------+----------------+------+--------------+
+|       5 | research       | M    |            3 |
+|       5 | research       | F    |            1 |
+|       1 | headquarters   | M    |            1 |
+|       4 | administration | F    |            2 |
+|       4 | administration | M    |            1 |
++---------+----------------+------+--------------+
+5 rows in set (0.00 sec)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+30. Find the name and age of youngest employee in each department.
+
+select concat_ws(' ', fname, minit, lname) as Name, date_format(from_days(datediff(curdate(), bdate)), '%y') as Age from employee where bdate in (select max(bdate) from employee group by dno);
++-----------------+------+
+| Name            | Age  |
++-----------------+------+
+| joyce A english | 48   |
+| james E borg    | 83   |
+| ahmad V jabbar  | 52   |
++-----------------+------+
+3 rows in set (0.15 sec)
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**********************************************************************************************************************************************************************************************************************
+
+Submitted by - Vaasvi Agarwal (Roll Number - 2020/459)
